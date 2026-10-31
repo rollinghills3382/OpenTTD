@@ -1,0 +1,4 @@
+##grflangid 0x01
+STR_GRF_NAME    :Twin Towers
+STR_GRF_DESC    :Adds the Twin Towers of the World Trade Center as a 2x2 town-centre building. Available from 1973, one per town.
+STR_TWIN_TOWERS :Twin Towers
