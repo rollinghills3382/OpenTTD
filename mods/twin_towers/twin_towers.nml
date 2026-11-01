@@ -64,12 +64,6 @@ switch (FEAT_HOUSES, SELF, sw_twin_towers_tile, house_tile) {
     HOUSE_TILE_SOUTH: layout_sphere_plaza;
 }
 
-/* Only one World Trade Center per town. */
-switch (FEAT_HOUSES, SELF, sw_twin_towers_check, same_house_count_town) {
-    0: return 1;
-    return 0;
-}
-
 item (FEAT_HOUSES, twin_towers, -1, HOUSE_SIZE_2X2) {
     property {
         substitute:              0x28; /* shopping centre (a 2x2 base house) */
@@ -82,13 +76,13 @@ item (FEAT_HOUSES, twin_towers, -1, HOUSE_SIZE_2X2) {
         accepted_cargos:         [[PASS, 8], [MAIL, 8], [GOOD, 4]];
         local_authority_impact:  500;
         removal_cost_multiplier: 255;
-        probability:             1;
+        /* Never grown by towns: placed by hand with the house picker only. */
+        probability:             0;
         building_class:          0;
-        /* Town centre only; temperate, sub-arctic (below snowline) and sub-tropical. */
+        /* Listed under "town centre" in the house picker; temperate, sub-arctic and sub-tropical. */
         availability_mask:       [bitmask(4), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC)];
     }
     graphics {
-        construction_check: sw_twin_towers_check;
         sw_twin_towers_tile;
     }
 }

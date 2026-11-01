@@ -10,9 +10,9 @@ A 2x2 town building that adds the Twin Towers of the World Trade Center to OpenT
 |---|---|
 | Footprint | 2x2 tiles: North Tower (with antenna) on the west tile, South Tower on the east tile, a planted plaza behind and The Sphere fountain in front |
 | Height | Towers are 172 px tall; the antenna tops out at 196 px above the north corner |
-| Where | Town centres only, in temperate, sub-arctic (below the snowline) and sub-tropical |
-| When | From 1973, never retired |
-| Limits | One per town, flagged as protected so the town won't rebuild it |
+| Spawning | Never built by towns on their own (probability 0). Place it by hand with the house picker, under "Town centre" |
+| Climates | Temperate, sub-arctic and sub-tropical |
+| Limits | Flagged as protected, so the town won't replace it once placed |
 | Gameplay | Population 255, high mail, accepts passengers, mail and goods |
 
 ## Scale
@@ -36,6 +36,10 @@ nmlc -c --grf=twin_towers.grf twin_towers.nml
 ```
 
 Copy `twin_towers.grf` into your OpenTTD `newgrf/` folder and enable it in the NewGRF settings before starting a new game.
+
+To place it in a game, set **Settings > Environment > Towns > Placing individual town houses** to "allowed" or "fully constructed". Then pick **Place houses** from the town toolbar menu, choose the "Town centre" tab and click Twin Towers. In the scenario editor the house picker is always available.
+
+This is a standalone GRF for now (grfid `TT\01\01`). It is expected to move into a larger building pack later.
 
 ## Files
 
