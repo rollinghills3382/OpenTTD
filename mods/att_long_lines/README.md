@@ -9,7 +9,7 @@ A 1x1 town building that adds the AT&T Long Lines Building (33 Thomas Street, Ne
 | | |
 |---|---|
 | Footprint | 1 tile. A bulky 14x14 slab, wider than the base-set offices |
-| Look | Windowless pink granite skin with vertical panel ribs, heavy corner piers, a recessed street-level base and two bands of louvred air intakes |
+| Look | Windowless grey-beige granite skin with vertical panel ribs, heavy corner piers, a recessed street-level base and two bands of louvred air intakes |
 | Height | 132 px to the roof |
 | Spawning | Towns never build it on their own (probability 0). Place it by hand with the house picker, under "Town centre" |
 | Climates | Temperate, sub-arctic and sub-tropical |

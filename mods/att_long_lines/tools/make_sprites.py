@@ -3,7 +3,7 @@
 Generate the AT&T Long Lines Building house sprite (8bpp, normal zoom) and the NML source.
 
 33 Thomas Street, Manhattan (1974): a windowless telephone exchange clad in
-pinkish granite, with vertical stone piers and big louvred air intakes
+grey-beige granite, with vertical stone piers and big louvred air intakes
 instead of windows. Drawn procedurally in OpenTTD's isometric projection so
 every pixel lines up with its bounding box. Run from anywhere:
 
@@ -36,14 +36,14 @@ BUILDING_H = 132       # roof height in px (= world z units)
 OFS = 1                # footprint offset inside the 16x16 tile
 SIZE = 14              # footprint (14x14 of 16x16 units): a bulky slab
 
-# Palette indices (TTD palette). Pinkish granite from the 122..127 ramp,
-# greys for the louvres. Avoids company colours (80-87, 198-205) and
+# Palette indices (TTD palette). Grey-beige granite from the 34..39 tan
+# ramp, greys for the louvres. Avoids company colours (80-87, 198-205) and
 # animated colours (>= 217).
-LEFT = dict(stone=127, seam=126, pier=127, recess=125, base=126)
-RIGHT = dict(stone=126, seam=125, pier=126, recess=124, base=125)
+LEFT = dict(stone=37, seam=36, pier=37, recess=35, base=36)
+RIGHT = dict(stone=36, seam=35, pier=36, recess=34, base=35)
 LOUVRE = (88, 106)     # alternating dark slats
-LOUVRE_FRAME = {'left': 126, 'right': 125}
-ROOF, ROOF_EDGE = 40, 126
+LOUVRE_FRAME = {'left': 36, 'right': 35}
+ROOF, ROOF_EDGE = 40, 36
 MECH_TOP, MECH_L, MECH_R = 12, 11, 33
 
 
