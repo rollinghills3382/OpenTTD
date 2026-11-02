@@ -1,0 +1,4 @@
+##grflangid 0x01
+STR_GRF_NAME      :Las Vegas Eye
+STR_GRF_DESC      :Adds the Las Vegas Sphere, showing its giant eyeball, as a 2x2 building. Towns never build it themselves: place it by hand with the house picker.
+STR_LAS_VEGAS_EYE :Las Vegas Eye
