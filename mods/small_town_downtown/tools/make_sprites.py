@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Generate three small-town downtown buildings (1900-1960) as 1x1 houses
+Generate six small-town downtown buildings (1900-1960) as 1x1 houses
 (8bpp, normal zoom) plus the NML source.
 
     * Brick commercial block, c.1905: two storeys of red brick, a shopfront
@@ -9,6 +9,8 @@ Generate three small-town downtown buildings (1900-1960) as 1x1 houses
       windows, a frieze and a heavy cornice.
     * Roxy Theatre, c.1948: an Art Deco cinema in cream stucco, with maroon
       streamline bands, a bulb-lit marquee and a vertical ROXY blade sign.
+    * Post office c.1915, town hall c.1910 (clock cupola) and Carnegie
+      library c.1905 (columned portico), in the same limestone as the bank.
 
 Run from anywhere:
 
@@ -51,7 +53,8 @@ class Canvas:
         self.px = {}
 
     def put(self, u, v, c):
-        self.px[(u, v)] = c
+        if c is not None:                       # None leaves the pixel transparent
+            self.px[(u, v)] = c
 
     def box(self, ox, oy, oz, sx, sy, sz, shade):
         """
@@ -306,6 +309,210 @@ def make_theatre():
 
 
 # ---------------------------------------------------------------------------
+# Civic buildings in the same limestone Neoclassical style as the bank
+# ---------------------------------------------------------------------------
+GLASS = (130, 129)
+COPPER = (101, 100, 99)        # verdigris: lit, mid, shade
+FLAG_RED, FLAG_WHITE, FLAG_BLUE = 163, 15, 146
+
+
+def limestone(face):
+    return lr(face, 38, 37), lr(face, 39, 38), lr(face, 36, 35)
+
+
+def classical_top(face, col, row, nrows):
+    """Shared cornice, dentils and frieze. Returns None below the frieze."""
+    stone, light, dark = limestone(face)
+    if row >= nrows - 2:
+        return light
+    if row == nrows - 3:
+        return stone if col % 2 == 0 else dark
+    if nrows - 6 <= row < nrows - 3:
+        return dark if row == nrows - 5 else stone
+    return None
+
+
+def roof_shader(face, col, row, ncols, nrows):
+    if col in (0, ncols - 1) or row in (0, nrows - 1):
+        return 38
+    return 40
+
+
+# 4. Post office, c.1915 ------------------------------------------------------
+POST_H = 25
+
+
+def post_office_shader(face, col, row, ncols, nrows):
+    if face == 'top':
+        return roof_shader(face, col, row, ncols, nrows)
+    stone, light, dark = limestone(face)
+    top = classical_top(face, col, row, nrows)
+    if top is not None:
+        # Lettering in the frieze ("UNITED STATES POST OFFICE").
+        if row == nrows - 4 and 2 <= col < ncols - 2 and col % 3 != 2:
+            return lr(face, 33, 32)
+        return top
+    if row < 2:
+        return lr(face, 36, 34)                          # granite plinth
+    if col in (0, ncols - 1):
+        return light                                     # quoins
+    # One tall storey of round-arched windows; the door is the middle arch.
+    seg = col % 5
+    if seg in (2, 3) and 3 <= row <= 16:
+        if row >= 15:
+            return light if row == 16 and seg == 2 else (GLASS[0] if face == 'left' else GLASS[1])
+        if face == 'left' and col // 5 == (ncols // 5) // 2 and row <= 11:
+            return 136                                   # doors
+        return lr(face, *GLASS) if row != 11 else stone  # transom bar
+    if seg in (2, 3) and row == 17:
+        return light                                     # keystone line
+    return stone
+
+
+def make_post_office():
+    c = Canvas()
+    c.box(2, 2, 0, 12, 12, POST_H, post_office_shader)
+    # Steps in front of the door.
+    c.box(14, 6, 0, 1, 4, 1, solid(39, 38, 36))
+    # Flagpole on the front corner of the roof, with the flag flying.
+    pu, pv = proj(13, 13, POST_H)
+    for i in range(18):
+        c.put(pu, pv - i, 15 if i < 17 else 52)
+    for r in range(5):
+        for k in range(7):
+            v = pv - 16 + r + k // 2                     # flag drapes along the iso diagonal
+            u = pu + 1 + k
+            if r < 3 and k < 3:
+                c.put(u, v, FLAG_BLUE)
+            else:
+                c.put(u, v, FLAG_RED if r % 2 == 0 else FLAG_WHITE)
+    return c, (2, 2, 0, 12, 12, POST_H + 18)
+
+
+# 5. Town hall, c.1910 ---------------------------------------------------------
+HALL_H = 30
+CUPOLA = (5, 5)                # roof position of the clock tower
+
+
+def town_hall_shader(face, col, row, ncols, nrows):
+    if face == 'top':
+        return roof_shader(face, col, row, ncols, nrows)
+    stone, light, dark = limestone(face)
+    top = classical_top(face, col, row, nrows)
+    if top is not None:
+        return top
+    if row < 2:
+        return lr(face, 36, 34)
+    if row == 12:
+        return light                                     # belt course between storeys
+    if col in (0, 1, ncols - 2, ncols - 1):
+        return light if row % 3 else dark                # rusticated corner quoins
+    seg = col % 4
+    if seg in (1, 2):
+        if 3 <= row <= 10:
+            if face == 'left' and col // 4 == (ncols // 4) // 2:
+                return 136 if seg == 1 or row < 9 else 136   # main doors
+            return lr(face, *GLASS)
+        if 14 <= row <= nrows - 8:
+            return lr(face, *GLASS) if row != nrows - 8 else light
+    return stone
+
+
+def clock_drum_shader(face, col, row, ncols, nrows):
+    if face == 'top':
+        return 38
+    stone, light, dark = limestone(face)
+    if row in (0, nrows - 1):
+        return light
+    # A white clock dial with dark hands, ringed in pale stone.
+    cc, rc = (ncols - 1) / 2, (nrows - 1) / 2
+    d2 = (col - cc) ** 2 + ((row - rc) * 1.4) ** 2
+    if d2 <= 9:
+        ci, ri = int(round(cc)), int(round(rc))
+        if (col, row) in ((ci, ri), (ci, ri + 1), (ci, ri + 2), (ci + 1, ri)):
+            return 136
+        return 15
+    if d2 <= 13:
+        return light
+    return stone
+
+
+def copper_shader(face, col, row, ncols, nrows):
+    return {'top': COPPER[0], 'left': COPPER[1], 'right': COPPER[2]}[face]
+
+
+def make_town_hall():
+    c = Canvas()
+    c.box(1, 1, 0, 14, 14, HALL_H, town_hall_shader)
+    x, y = CUPOLA
+    z = HALL_H
+    c.box(x, y, z, 5, 5, 2, solid(39, 38, 36))           # base
+    c.box(x, y, z + 2, 5, 5, 10, clock_drum_shader)       # clock drum
+    c.box(x, y, z + 12, 5, 5, 2, copper_shader)           # copper roof, stepped
+    c.box(x + 1, y + 1, z + 14, 3, 3, 2, copper_shader)
+    c.box(x + 2, y + 2, z + 16, 1, 1, 2, copper_shader)
+    pu, pv = proj(x + 2, y + 3, z + 18)
+    for i in range(4):
+        c.put(pu, pv - i, 52 if i == 3 else 32)          # finial
+    return c, (1, 1, 0, 14, 14, HALL_H + 22)
+
+
+# 6. Carnegie library, c.1905 --------------------------------------------------
+LIB_H = 24
+
+
+def library_shader(face, col, row, ncols, nrows):
+    if face == 'top':
+        return roof_shader(face, col, row, ncols, nrows)
+    stone, light, dark = limestone(face)
+    top = classical_top(face, col, row, nrows)
+    if top is not None:
+        return top
+    if row < 4:
+        return lr(face, 36, 34)                          # raised basement
+    if col in (0, ncols - 1):
+        return light
+    seg = col % 6
+    if seg in (2, 3) and 6 <= row <= nrows - 9:
+        return lr(face, *GLASS) if row != 13 else stone
+    return stone
+
+
+def portico_shader(face, col, row, ncols, nrows):
+    stone, light, dark = limestone(face)
+    if face == 'top':
+        return None                                      # hidden behind the pediment
+    if face == 'right':
+        if row >= nrows - 7:
+            return light if row == nrows - 7 else None
+        return dark
+    # Front: a triangular pediment over an entablature and four columns.
+    ped = nrows - 7
+    if row >= ped:
+        h = row - ped
+        half = (ncols - 1) / 2
+        if h * 1.3 > half - abs(col - half) + 0.5:
+            return None                                  # sky around the pediment
+        if h * 1.3 > half - abs(col - half) - 1.5 or h == 0:
+            return lr(face, 39, 38)                      # raking cornice
+        return lr(face, 35, 34)                          # shadowed tympanum
+    if row >= ped - 3:
+        return dark if row == ped - 2 else stone         # entablature
+    if col % 3 == 0 or col == ncols - 1:
+        return light                                     # columns
+    return 136 if row < ped - 6 and ncols // 3 <= col < ncols - ncols // 3 else dark
+
+
+def make_library():
+    c = Canvas()
+    c.box(2, 2, 0, 12, 12, LIB_H, library_shader)
+    # Wide steps up to the portico, then the portico itself on the lit face.
+    c.box(14, 4, 0, 2, 8, 2, solid(39, 38, 36))
+    c.box(14, 5, 2, 1, 6, LIB_H - 2 + 4, portico_shader)
+    return c, (2, 2, 0, 14, 12, LIB_H + 4)
+
+
+# ---------------------------------------------------------------------------
 # Sheet + NML output
 # ---------------------------------------------------------------------------
 BUILDINGS = [
@@ -313,6 +520,9 @@ BUILDINGS = [
     ('brick_block', 'STR_BRICK_BLOCK', make_brick_block, 1905, 30, 30, '[[PASS, 4], [MAIL, 4], [GOOD, 8]]'),
     ('town_bank', 'STR_TOWN_BANK', make_bank, 1920, 20, 60, '[[PASS, 4], [MAIL, 8]]'),
     ('roxy_theatre', 'STR_ROXY_THEATRE', make_theatre, 1948, 40, 20, '[[PASS, 8], [MAIL, 2], [GOOD, 4]]'),
+    ('post_office', 'STR_POST_OFFICE', make_post_office, 1915, 15, 255, '[[PASS, 4], [MAIL, 8]]'),
+    ('town_hall', 'STR_TOWN_HALL', make_town_hall, 1910, 35, 80, '[[PASS, 8], [MAIL, 8]]'),
+    ('carnegie_library', 'STR_CARNEGIE_LIBRARY', make_library, 1905, 15, 40, '[[PASS, 4], [MAIL, 4]]'),
 ]
 
 
@@ -345,15 +555,15 @@ def main():
 
 
 def write_preview(sheet, entries):
-    """The three buildings side by side along a street, on concrete tiles."""
-    W, H = 150, 95
+    """All the buildings side by side along a street, on concrete tiles."""
+    W, H = 36 + 32 * len(BUILDINGS) + 40, 50 + 16 * len(BUILDINGS) + 20
     prev = Image.new('RGB', (W, H), (0, 0, 255))
     d = ImageDraw.Draw(prev)
     # Lay the tiles out along the y axis (a row running down to the right).
     origins = []
-    for i in range(3):
+    for i in range(len(BUILDINGS)):
         ou, ov = proj(0, i * 16, 0)
-        origins.append((36 + ou, 40 + ov))
+        origins.append((36 + ou, 50 + ov))
     for org in origins:
         pts = [proj(a, b, 0) for a, b in ((0, 0), (16, 0), (16, 16), (0, 16))]
         d.polygon([(org[0] + p[0], org[1] + p[1]) for p in pts], fill=(168, 168, 168), outline=(132, 132, 132))
@@ -368,7 +578,7 @@ def write_preview(sheet, entries):
 
 NML_HEAD = """\
 /*
- * Small-town downtown buildings (1900-1960) - three 1x1 town buildings for OpenTTD.
+ * Small-town downtown buildings (1900-1960) - six 1x1 town buildings for OpenTTD.
  *
  * GENERATED by tools/make_sprites.py - edit that script, not this file.
  */

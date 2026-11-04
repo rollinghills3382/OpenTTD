@@ -1,6 +1,9 @@
 ##grflangid 0x01
 STR_GRF_NAME     :Small-Town Downtown
-STR_GRF_DESC     :Adds three small-town Main Street buildings from 1900-1960: a brick commercial block, a stone town bank and an Art Deco theatre. Towns never build them themselves: place them by hand with the house picker.
+STR_GRF_DESC     :Adds six small-town Main Street buildings from 1900-1960: a brick commercial block, an Art Deco theatre, and a matching stone set of town bank, post office, town hall and Carnegie library. Towns never build them themselves: place them by hand with the house picker.
 STR_BRICK_BLOCK  :Brick Commercial Block
 STR_TOWN_BANK    :Town Bank
 STR_ROXY_THEATRE :Roxy Theatre
+STR_POST_OFFICE      :Post Office
+STR_TOWN_HALL        :Town Hall
+STR_CARNEGIE_LIBRARY :Carnegie Library
