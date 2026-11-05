@@ -1,0 +1,4 @@
+##grflangid 0x01
+STR_GRF_NAME    :Twin Towers
+STR_GRF_DESC    :Adds the Twin Towers of the World Trade Center as a 2x2 building. Towns never build it themselves: place it by hand with the house picker.
+STR_TWIN_TOWERS :Twin Towers

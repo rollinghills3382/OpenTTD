@@ -1,0 +1,4 @@
+##grflangid 0x01
+STR_GRF_NAME    :Service Station
+STR_GRF_DESC    :Adds a 1950s service station as a 2x2 building: garage with service bays, pump canopy, GAS sign and parking. Towns never build it themselves: place it by hand with the house picker.
+STR_GAS_STATION :Service Station

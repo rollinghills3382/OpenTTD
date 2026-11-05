@@ -1,0 +1,4 @@
+##grflangid 0x01
+STR_GRF_NAME       :AT&T Long Lines Building
+STR_GRF_DESC       :Adds the AT&T Long Lines Building (33 Thomas Street, New York) as a 1x1 building. Towns never build it themselves: place it by hand with the house picker.
+STR_ATT_LONG_LINES :AT&T Long Lines Building
